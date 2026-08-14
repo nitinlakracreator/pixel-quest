@@ -1,23 +1,36 @@
-# Pixel Quest: The Ember Tunnels
+# 🎮 Pixel Quest: The Ember Tunnels
 
-A 16-bit style pixel art action platformer by Nitin Lakra, GP Sonipat Polytechnic.
+> **▶ [TAP TO PLAY NOW!](https://nitinlakracreator.github.io/pixel-quest/)**
 
-## Play instantly
+A 16-bit style pixel art action platformer — by **Nitin Lakra, GP Sonipat Polytechnic**.
 
-Just open **index.html** in any modern browser — no installation needed.
+Play instantly in your browser: **https://nitinlakracreator.github.io/pixel-quest/**
 
-## Put it on GitHub (one-click play)
+## How to Play
 
-1. Create a new repository on GitHub (e.g. `pixel-quest`).
-2. Upload all files from this folder (index.html, assets/, hi-res-assets/, README, NOTICE).
-3. Go to repository **Settings → Pages**, set Source to "Deploy from a branch", choose branch `main` and folder `/ (root)`, click **Save**.
-4. After ~1 minute the game plays at `https://your-username.github.io/pixel-quest/`.
+Run, jump, and fight through volcanic tunnels, defeat slimes, bats, and fire skulls, collect coins and gems, and challenge the Guardian boss!
 
-## Contents
+| Control | Action |
+|---|---|
+| Arrow keys / WASD | Move |
+| Space / W / Up | Jump |
+| Z | Attack |
+| Esc | Pause |
+| N | Show ownership notice |
+
+On mobile, touch buttons appear on screen automatically.
+
+## About
+
+This game features 3 hand-designed levels plus a boss battle, parallax cave backgrounds, screen shake, particles, coins, gems, lava pits, and spikes. Includes the Transformers-style "Welcome Nitin." startup animation, your ownership notice, and a highlighted credit banner.
+
+**Ownership:** This game is the original and sole property of Nitin Lakra, GP Sonipat Polytechnic. All rights reserved. Not for experimental use by others — see `NOTICE.md`.
+
+## Repository Contents
 
 | Item | Purpose |
 |---|---|
-| index.html | Game entry page (open in browser) |
-| assets/ | Game bundle + artwork (required — do not rename) |
-| hi-res-assets/ | Original full-resolution art (bonus, not used by the game) |
-| NOTICE.md | Official ownership notice — Nitin Lakra, GP Sonipat Polytechnic |
+| `index.html` + `assets/` | The playable game (served by GitHub Pages) |
+| `hi-res-assets/` | Original full-resolution artwork |
+| `source/` | Full editable source code (engine, levels, sprites, UI) |
+| `NOTICE.md` | Official ownership notice |
