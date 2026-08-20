@@ -110,6 +110,10 @@ export class Game {
     return d;
   }
 
+  activate() {
+    this.onActionPress();
+  }
+
   private onActionPress() {
     if (this.state === "notice") {
       // mark notice as seen for this browser, then go to title

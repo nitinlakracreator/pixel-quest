@@ -34,6 +34,7 @@ export default function GameCanvas() {
   return (
     <canvas
       ref={canvasRef}
+      onPointerDown={() => gameRef.current?.activate()}
       style={{
         position: "fixed",
         inset: 0,
