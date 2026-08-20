@@ -18,8 +18,13 @@ async function startServer() {
 
   app.use(express.static(staticPath));
 
+  // Keep unknown API requests as JSON 404s; never route them into the SPA fallback.
+  app.use("/api", (_req, res) => {
+    res.status(404).json({ error: "API route not found" });
+  });
+
   // Handle client-side routing - serve index.html for all routes
-  app.get("*", (_req, res) => {
+  app.get("/{*splat}", (_req, res) => {
     res.sendFile(path.join(staticPath, "index.html"));
   });
 
