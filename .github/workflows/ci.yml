@@ -30,3 +30,15 @@ jobs:
       - run: pnpm audit --audit-level high
       - run: pnpm build
       - run: test -f dist/index.js
+      # CI production HTTP smoke test
+      - name: Smoke test production HTTP server
+        run: |
+          PORT=3005 node dist/index.js >/tmp/app-3005.log 2>&1 &
+          server_pid=$!
+          trap "kill $server_pid 2>/dev/null || true" EXIT
+          for attempt in $(seq 1 30); do
+            if curl --silent --show-error --fail http://127.0.0.1:3005/ >/dev/null; then break; fi
+            sleep 1
+          done
+          curl --silent --show-error --fail http://127.0.0.1:3005/ >/dev/null
+          test "$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:3005/api/ci-smoke)" = 404
