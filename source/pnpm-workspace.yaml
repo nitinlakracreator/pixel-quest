@@ -1,8 +1,19 @@
 packages:
-  - '.'
+  - "."
 overrides:
-  '**/lodash': 4.18.1
-  '**/lodash-es': 4.18.1
-  'mermaid': 11.17.0
-  'nanoid': 6.0.1
-  'tailwindcss>nanoid': 3.3.7
+  lodash: 4.18.1
+  lodash-es: 4.18.1
+  "mermaid": 11.17.0
+  "nanoid": 6.0.1
+  "tailwindcss>nanoid": 3.3.7
+  "@babel/core": 7.29.7
+  esbuild: 0.28.2
+  picomatch: 4.0.5
+  postcss: 8.5.26
+  rollup: 4.62.5
+  tar: 7.5.22
+  vite: 7.3.6
+  "fdir>picomatch": 4.0.5
+  "tinyglobby>picomatch": 4.0.5
+  "vite>rollup": 4.62.5
+  "@vitejs/plugin-react>@babel/core": 7.29.7
