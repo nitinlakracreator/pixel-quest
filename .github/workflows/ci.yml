@@ -26,7 +26,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
       - run: pnpm test -- --run
-      - run: pnpm exec prettier --check source/package.json source/pnpm-workspace.yaml source/vite.config.ts source/vite.config.clean.ts
+      - run: pnpm exec prettier --check package.json pnpm-workspace.yaml vite.config.ts vite.config.clean.ts
       - run: pnpm audit --audit-level high
       - run: pnpm build
       - run: test -f dist/index.js
