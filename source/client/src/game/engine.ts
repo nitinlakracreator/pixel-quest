@@ -85,11 +85,14 @@ export class Game {
     const up = (e: KeyboardEvent) => {
       this.keys[e.code] = false;
     };
+    const pointer = () => this.onActionPress();
     window.addEventListener("keydown", down);
     window.addEventListener("keyup", up);
+    this.canvas.addEventListener("pointerdown", pointer);
     this._cleanupInput = () => {
       window.removeEventListener("keydown", down);
       window.removeEventListener("keyup", up);
+      this.canvas.removeEventListener("pointerdown", pointer);
     };
   }
   private _cleanupInput: () => void = () => {};
@@ -105,6 +108,10 @@ export class Game {
     if (this.keys["ArrowLeft"] || this.keys["KeyA"] || this.touch.left) d -= 1;
     if (this.keys["ArrowRight"] || this.keys["KeyD"] || this.touch.right) d += 1;
     return d;
+  }
+
+  activate() {
+    this.onActionPress();
   }
 
   private onActionPress() {

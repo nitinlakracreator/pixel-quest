@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: source
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: source/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm test -- --run
+      - run: pnpm exec prettier --check package.json pnpm-workspace.yaml vite.config.ts vite.config.clean.ts
+      - run: pnpm audit --audit-level high
+      - run: pnpm build
+      - run: test -f dist/index.js
+      # CI production HTTP smoke test
+      - name: Smoke test production HTTP server
+        run: |
+          PORT=3005 node dist/index.js >/tmp/app-3005.log 2>&1 &
+          server_pid=$!
+          trap "kill $server_pid 2>/dev/null || true" EXIT
+          for attempt in $(seq 1 30); do
+            if curl --silent --show-error --fail http://127.0.0.1:3005/ >/dev/null; then break; fi
+            sleep 1
+          done
+          curl --silent --show-error --fail http://127.0.0.1:3005/ >/dev/null
+          curl --silent --show-error --dump-header /tmp/headers-3005.txt http://127.0.0.1:3005/ >/dev/null
+          grep -Fiq "X-Content-Type-Options: nosniff" /tmp/headers-3005.txt
+          grep -Fiq "X-Frame-Options: DENY" /tmp/headers-3005.txt
+          grep -Fiq "Referrer-Policy: strict-origin-when-cross-origin" /tmp/headers-3005.txt
+          test "$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:3005/api/ci-smoke)" = 404
