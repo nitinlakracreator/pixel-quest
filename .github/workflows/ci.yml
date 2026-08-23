@@ -45,4 +45,8 @@ jobs:
             sleep 1
           done
           curl --silent --show-error --fail http://127.0.0.1:3005/ >/dev/null
+          curl --silent --show-error --dump-header /tmp/headers-3005.txt http://127.0.0.1:3005/ >/dev/null
+          grep -Fiq "X-Content-Type-Options: nosniff" /tmp/headers-3005.txt
+          grep -Fiq "X-Frame-Options: DENY" /tmp/headers-3005.txt
+          grep -Fiq "Referrer-Policy: strict-origin-when-cross-origin" /tmp/headers-3005.txt
           test "$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:3005/api/ci-smoke)" = 404
