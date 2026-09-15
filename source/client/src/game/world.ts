@@ -233,6 +233,8 @@ export class World {
   private bossDefeated = false;
   private levelIntroT = 0;
 
+  private static readonly ASSETS = "/assets/";
+
   constructor(private game: Game) {
     this.level = LEVELS[0];
     this.player = new Player(this.game, 2 * TILE, 11 * TILE);
@@ -247,10 +249,10 @@ export class World {
         img.onerror = () => res(img); // render nothing rather than break
         img.src = src;
       });
-    load("/manus-storage/bg-parallax-far_4e92de9b.png").then((i) => (this.images.far = i));
-    load("/manus-storage/bg-parallax-mid_965e67a2.png").then((i) => (this.images.mid = i));
-    load("/manus-storage/title-art_e1422e3c.png").then((i) => (this.images.title = i));
-    load("/manus-storage/gameover-art_b177573e.png").then((i) => (this.images.over = i));
+    load(`${World.ASSETS}bg-parallax-far.png`).then((i) => (this.images.far = i));
+    load(`${World.ASSETS}bg-parallax-mid.png`).then((i) => (this.images.mid = i));
+    load(`${World.ASSETS}title-art.png`).then((i) => (this.images.title = i));
+    load(`${World.ASSETS}gameover-art.png`).then((i) => (this.images.over = i));
   }
 
   get atlas(): SpriteAtlas {

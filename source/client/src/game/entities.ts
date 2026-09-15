@@ -56,6 +56,7 @@ export class Player {
     const d = g.dir();
     this.vx = d * WALK;
     if (d !== 0) this.facing = d;
+    if (g.startAttack()) this.attack();
 
     // Jump buffering + coyote time
     if (g.startAction()) {

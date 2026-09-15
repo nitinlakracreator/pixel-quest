@@ -175,3 +175,66 @@
     }
   }
 }
+
+
+/* Pixel Quest controls: visible only on coarse-pointer devices. */
+.pq-game-shell {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #1e1420;
+}
+
+.pq-touch-controls {
+  display: none;
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 20;
+  justify-content: space-between;
+  align-items: end;
+  padding: 0 clamp(14px, 4vw, 36px) clamp(14px, 4vw, 28px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.pq-touch-cluster {
+  display: flex;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.pq-touch-button {
+  width: clamp(52px, 15vw, 76px);
+  height: clamp(52px, 15vw, 76px);
+  border: 2px solid rgba(255, 209, 102, 0.78);
+  border-radius: 14px;
+  color: #ffe9a0;
+  background: rgba(18, 10, 20, 0.76);
+  box-shadow: 0 4px 0 #3c2035, inset 0 0 18px rgba(255, 122, 51, 0.18);
+  font: 700 clamp(10px, 2.5vw, 15px) "Press Start 2P", monospace;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pq-touch-button:active {
+  color: #120a14;
+  background: #ffd166;
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #3c2035;
+}
+
+.pq-left::before { content: "◀"; }
+.pq-right::before { content: "▶"; }
+.pq-jump::before { content: "JUMP"; }
+.pq-attack::before { content: "HIT"; }
+.pq-touch-button { font-size: 0; }
+.pq-touch-button::before { font-size: clamp(11px, 2.5vw, 15px); }
+
+@media (pointer: coarse), (max-width: 700px) {
+  .pq-touch-controls { display: flex; }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .pq-touch-controls { padding-bottom: 8px; }
+  .pq-touch-button { width: 48px; height: 48px; border-radius: 10px; }
+}

@@ -120,6 +120,11 @@ export class Game {
     }
   }
 
+  /** Shared action entry point for keyboard, gamepad, and touch controls. */
+  pressAction() {
+    this.onActionPress();
+  }
+
   /** Opens the ownership & legal notice (available any time via N key). */
   showNotice() {
     this.state = "notice";
