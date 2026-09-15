@@ -19,6 +19,7 @@ export class UI {
   private overArt?: HTMLImageElement;
   private blinkT = 0;
   private bannerT = 0;
+  private nameRevealT = 0;
 
   /**
    * Highlighted credit banner drawn at the TOP of every screen.
@@ -100,6 +101,10 @@ export class UI {
   drawTitle() {
     const r = this.game.renderer;
     this.blinkT++;
+    // Four seconds at the fixed 60fps simulation rate. The title remains
+    // interactive during the reveal, but the prompt waits until the name has
+    // fully assembled so the intro reads like a deliberate logo sting.
+    this.nameRevealT = Math.min(240, this.nameRevealT + 1);
 
     if (this.titleArt) {
       // cover-fit draw: scale to cover then center-crop
@@ -118,12 +123,40 @@ export class UI {
       r.clearScreen("#1e1420");
     }
 
+    // Transformers-inspired NITIN name sting: scan lines, flying metal shards,
+    // hard light flashes, then a steady chrome/gold lock-up.
+    const reveal = this.nameRevealT / 240;
+    const nameY = 27 + Math.sin(Math.min(1, reveal) * Math.PI) * 2;
+    r.ctx.save();
+    r.ctx.globalAlpha = Math.min(1, reveal * 1.8);
+    const shards = [
+      [-72, -8, 1], [-54, 7, -1], [-36, -6, 1], [36, 6, -1], [54, -7, 1], [72, 8, -1],
+    ];
+    for (const [x, y, dir] of shards) {
+      const travel = Math.max(0, 1 - reveal) * 1.4;
+      r.ctx.fillStyle = dir > 0 ? "#8b9aa8" : "#f4b942";
+      r.ctx.fillRect(GW / 2 + x * travel - 2, nameY + y * travel, 4, 2);
+    }
+    if (reveal > 0.08) {
+      const glow = 0.35 + 0.65 * Math.abs(Math.sin(this.nameRevealT * 0.18));
+      r.ctx.shadowColor = `rgba(255, 190, 70, ${glow})`;
+      r.ctx.shadowBlur = reveal < 0.55 ? 12 : 6;
+      r.text("N I T I N", GW / 2, nameY, reveal < 0.55 ? "#d9e4ea" : "#ffd166", 5, "center");
+      r.ctx.shadowBlur = 0;
+      r.text("SYSTEM ONLINE", GW / 2, nameY + 15, "#8b9aa8", 1, "center", false);
+    }
+    if (reveal > 0.2 && reveal < 0.72) {
+      r.ctx.fillStyle = `rgba(255, 238, 170, ${0.45 * (1 - reveal)})`;
+      r.ctx.fillRect(24 + reveal * (GW - 48), 20, 3, 44);
+    }
+    r.ctx.restore();
+
     // logo + title
     if (this.logo) r.drawImage(this.logo, GW / 2 - 12, 26, 24, 24);
-    r.text("PIXEL QUEST", GW / 2, 54, "#ffd166", 4, "center");
+    r.text("PIXEL QUEST", GW / 2, reveal >= 0.98 ? 54 : 62, "#ffd166", 4, "center");
     r.text("THE EMBER TUNNELS", GW / 2, 96, "#ff7a33", 3, "center");
 
-    const blink = Math.floor(this.blinkT / 30) % 2 === 0;
+    const blink = reveal >= 0.98 && Math.floor(this.blinkT / 30) % 2 === 0;
     if (blink) r.text("PRESS ENTER OR SPACE", GW / 2, 136, "#ffffff", 3, "center");
 
     if (this.game.highScore > 0) r.text(`BEST ${this.game.highScore}`, GW / 2, 158, "#ffd166", 2, "center");

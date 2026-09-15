@@ -58,7 +58,8 @@ export class Player {
     if (d !== 0) this.facing = d;
     if (g.startAttack()) this.attack();
 
-    // Jump buffering + coyote time
+    // Jump buffering + coyote time. Grounding is resolved after collision below,
+    // so a fresh landing can immediately feed the next jump buffer.
     if (g.startAction()) {
       if (this.jumpBuf <= 0) this.jumpBuf = 8;
     }
@@ -86,7 +87,9 @@ export class Player {
     const beforeG = this.grounded;
     this.collideY(w);
 
-    const t = w.tileAt(this.x + this.w / 2, this.y + this.h - 2);
+    // Sample the tile just below the feet. The old -2 sample was still inside
+    // the player when standing on a 16px tile, leaving grounded=false forever.
+    const t = w.tileAt(this.x + this.w / 2, this.y + this.h + 1);
     this.grounded = t === 1 || t === 2 || t === 5;
     if (this.grounded && !beforeG) {
       this.jumpsLeft = 2;
