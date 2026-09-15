@@ -101,10 +101,10 @@ export class UI {
   drawTitle() {
     const r = this.game.renderer;
     this.blinkT++;
-    // Four-second assembly followed by a ten-second hold at the fixed 60fps
-    // simulation rate. The title remains interactive during the reveal, but
-    // the prompt waits until the name sting has fully played.
-    this.nameRevealT = Math.min(840, this.nameRevealT + 1);
+    // Eight-second assembly followed by a ten-second hold at the fixed 60fps
+    // simulation rate. The slower reveal gives the metallic shards and glow
+    // time to read clearly before the completed name stays on screen.
+    this.nameRevealT = Math.min(1080, this.nameRevealT + 1);
 
     if (this.titleArt) {
       // cover-fit draw: scale to cover then center-crop
@@ -125,7 +125,7 @@ export class UI {
 
     // Transformers-inspired NITIN name sting: scan lines, flying metal shards,
     // hard light flashes, then a steady chrome/gold lock-up.
-    const reveal = Math.min(1, this.nameRevealT / 240);
+    const reveal = Math.min(1, this.nameRevealT / 480);
     const nameY = 27 + Math.sin(Math.min(1, reveal) * Math.PI) * 2;
     r.ctx.save();
     r.ctx.globalAlpha = Math.min(1, reveal * 1.8);
