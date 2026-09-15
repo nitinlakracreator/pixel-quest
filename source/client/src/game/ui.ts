@@ -9,9 +9,9 @@ import { PixelRenderer } from "./render";
 
 const CREDIT = "GP Sonipat • Powered and created by Nitin.";
 
-const TITLE_ART = "/assets/title-art.png";
-const LOGO = "/assets/logo-mark.png";
-const OVER_ART = "/assets/gameover-art.png";
+const TITLE_ART = "./assets/title-art.png";
+const LOGO = "./assets/logo-mark.png";
+const OVER_ART = "./assets/gameover-art.png";
 
 export class UI {
   private titleArt?: HTMLImageElement;

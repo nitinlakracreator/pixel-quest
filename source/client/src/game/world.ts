@@ -233,7 +233,7 @@ export class World {
   private bossDefeated = false;
   private levelIntroT = 0;
 
-  private static readonly ASSETS = "/assets/";
+  private static readonly ASSETS = "./assets/";
 
   constructor(private game: Game) {
     this.level = LEVELS[0];
