@@ -75,6 +75,7 @@ export class Game {
       // a clean browser profile for CI/screenshot verification.
       localStorage.setItem("pq_notice_seen", "1");
       this.beginLevel(1);
+      (window as unknown as { __PIXEL_QUEST__?: Game }).__PIXEL_QUEST__ = this;
     } else if (!localStorage.getItem("pq_notice_seen")) {
       this.state = "notice";
     }
@@ -269,5 +270,6 @@ export class Game {
     this._cleanupInput();
     this.world.dispose();
     this.atlas.dispose();
+    if (this.demoMode) delete (window as unknown as { __PIXEL_QUEST__?: Game }).__PIXEL_QUEST__;
   }
 }

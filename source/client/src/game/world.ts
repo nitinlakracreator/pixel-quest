@@ -220,7 +220,7 @@ function buildLevel3(): LevelData {
   };
 }
 
-const LEVELS: LevelData[] = [buildLevel1(), buildLevel2(), buildLevel3()];
+export const LEVELS: LevelData[] = [buildLevel1(), buildLevel2(), buildLevel3()];
 
 export class World {
   player: Player;

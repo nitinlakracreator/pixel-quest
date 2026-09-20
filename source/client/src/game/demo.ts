@@ -50,7 +50,9 @@ export class DemoPilot {
     const wallAhead = this.game.world.isSolid(wx + 24, wy + 8) && !this.game.world.isSolid(wx + 24, wy - 20);
     const p = this.game.world.player;
     const nearEnemy = this.game.world.enemies.some((e) => !e.dead && Math.abs(e.x - wx) < 60);
-    if (this.t % 60 < 14 || hazardAhead || wallAhead || (p.grounded && (noFloorAhead || nearEnemy))) k["Space"] = true;
+    const boss = this.game.world.boss;
+    const nearBoss = Boolean(boss?.alive && Math.abs(boss.x - wx) < 92);
+    if (this.t % 60 < 14 || hazardAhead || wallAhead || nearBoss || (p.grounded && (noFloorAhead || nearEnemy))) k["Space"] = true;
     else k["Space"] = false;
 
     // attack when an enemy is close
@@ -59,6 +61,13 @@ export class DemoPilot {
         k["KeyZ"] = true;
         return;
       }
+    }
+    // Keep attacking while closing on the Guardian. The jump cadence above
+    // prevents contact damage while the attack cooldown chips through all six
+    // boss hit points and lets the normal victory transition run.
+    if (nearBoss) {
+      k["KeyZ"] = true;
+      return;
     }
     k["KeyZ"] = false;
   }
