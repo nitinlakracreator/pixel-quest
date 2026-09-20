@@ -14,20 +14,21 @@ All characters, tiles, and effects are drawn procedurally via canvas pixel rende
 ## Risk slices (build first)
 - [x] Pixel-perfect canvas renderer: fixed internal resolution (424x240) scaled by CSS with image-rendering: pixelated; integer pixel sprite drawing.
 - [x] Physics: gravity, jump, double-jump, coyote time, jump buffering, AABB collision with tilemap.
-- [ ] Camera with smooth follow + screen shake.
-- [ ] Animated player sprite (run/jump/attack/idle) drawn procedurally.
-- [ ] Enemy AI: slime patrol+bounce, bat sine flight, skull shooter, Ember Guardian boss pattern.
+- [x] Camera with smooth follow + screen shake.
+- [x] Animated player sprite (run/jump/attack/idle) drawn procedurally.
+- [x] Enemy AI: slime patrol+bounce, bat sine flight, skull shooter, Ember Guardian boss pattern.
 
 ## Main build
-- [ ] Tilemap loader (2D array), 3 hand-crafted levels + boss chamber.
-- [ ] Parallax backgrounds using generated images.
-- [ ] Particles: ember sparks, coin pop, death burst, attack whoosh.
-- [ ] HUD: hearts, coins, score, level name in Press Start 2P font.
-- [ ] Game states: Title → Playing → GameOver → Victory, pause with ESC.
-- [ ] LocalStorage high score.
-- [ ] Touch controls (mobile) + keyboard (arrows/WASD, space/X = jump, Z/C = attack).
-- [ ] Credit line "Powered and created by Nitin." on title screen + in-game pause.
+- [x] Tilemap loader (2D array), 3 hand-crafted levels + boss chamber.
+- [x] Parallax backgrounds using generated images.
+- [x] Particles: ember sparks, coin pop, death burst, attack whoosh.
+- [x] HUD: hearts, coins, score, level name in Press Start 2P font.
+- [x] Game states: Title → Playing → GameOver → Victory, pause with ESC and mobile pause button.
+- [x] LocalStorage high score and forward-progress checkpoints.
+- [x] Touch controls (mobile) + keyboard (arrows/WASD, space/X = jump, Z/C = attack).
+- [x] Credit line "Powered and created by Nitin." on title screen + in-game pause.
 
 ## Verification
-- pnpm check clean; webdev_take_screenshot with ?demo autoplay flag showing title, gameplay, and game-over states.
+- pnpm check and pnpm build clean; Chromium screenshots with ?demo verified at desktop 1440x900 and mobile 390x844.
+- Demo mode starts level one directly and is safe to run in a clean browser profile.
 - Only text visible = game text + "Powered and created by Nitin."

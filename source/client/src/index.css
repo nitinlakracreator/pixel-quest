@@ -192,7 +192,7 @@
   z-index: 20;
   justify-content: space-between;
   align-items: end;
-  padding: 0 clamp(14px, 4vw, 36px) clamp(14px, 4vw, 28px);
+  padding: 0 max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
   pointer-events: none;
   user-select: none;
 }
@@ -201,6 +201,7 @@
   display: flex;
   gap: 10px;
   pointer-events: auto;
+  align-items: end;
 }
 
 .pq-touch-button {
@@ -227,6 +228,7 @@
 .pq-right::before { content: "▶"; }
 .pq-jump::before { content: "JUMP"; }
 .pq-attack::before { content: "HIT"; }
+.pq-pause::before { content: "PAUSE"; }
 .pq-touch-button { font-size: 0; }
 .pq-touch-button::before { font-size: clamp(11px, 2.5vw, 15px); }
 
@@ -235,6 +237,6 @@
 }
 
 @media (max-height: 520px) and (orientation: landscape) {
-  .pq-touch-controls { padding-bottom: 8px; }
+  .pq-touch-controls { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
   .pq-touch-button { width: 48px; height: 48px; border-radius: 10px; }
 }

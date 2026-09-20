@@ -46,12 +46,13 @@ export default function GameCanvas() {
       }}
       onPointerUp={(event) => {
         event.preventDefault();
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+          event.currentTarget.releasePointerCapture(event.pointerId);
+        }
         setTouch(key, false);
       }}
       onPointerCancel={() => setTouch(key, false)}
-      onPointerLeave={(event) => {
-        if (event.currentTarget.hasPointerCapture(event.pointerId)) setTouch(key, false);
-      }}
+      onLostPointerCapture={() => setTouch(key, false)}
     >
       {label}
     </button>
@@ -80,6 +81,17 @@ export default function GameCanvas() {
         </div>
         <div className="pq-touch-cluster pq-touch-actions">
           {button("jump", "Jump or start", "pq-jump")} {button("attack", "Attack", "pq-attack")}
+          <button
+            type="button"
+            aria-label="Pause or resume"
+            className="pq-touch-button pq-pause"
+            onPointerDown={(event) => {
+              event.preventDefault();
+              gameRef.current?.pressPause();
+            }}
+          >
+            <span aria-hidden="true">Ⅱ</span>
+          </button>
         </div>
       </div>
     </div>

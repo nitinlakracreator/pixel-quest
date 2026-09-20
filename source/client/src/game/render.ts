@@ -21,13 +21,15 @@ export class PixelRenderer {
   }
 
   resize() {
-    const target = window.devicePixelRatio > 1 && window.innerWidth < 900 ? 1.5 : 1;
-    this.canvas.width = Math.floor(window.innerWidth * target);
-    this.canvas.height = Math.floor(window.innerHeight * target);
-    this.scale = Math.max(1, Math.floor(Math.min(this.canvas.width / GW, this.canvas.height / GH)));
-    this.canvas.style.width = `${Math.floor(GW * this.scale)}px`;
-    this.canvas.style.height = `${Math.floor(GH * this.scale)}px`;
-    this.canvas.style.margin = "auto";
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    this.canvas.width = Math.max(1, Math.floor(window.innerWidth * pixelRatio));
+    this.canvas.height = Math.max(1, Math.floor(window.innerHeight * pixelRatio));
+    // Keep the whole 16:9 game visible. The previous minimum 1x scale made a
+    // portrait phone render only a 424x240 island in the middle of the screen.
+    this.scale = Math.min(this.canvas.width / GW, this.canvas.height / GH);
+    this.canvas.style.width = "100vw";
+    this.canvas.style.height = "100vh";
+    this.canvas.style.margin = "0";
     this.canvas.style.position = "fixed";
     this.canvas.style.left = "50%";
     this.canvas.style.top = "50%";

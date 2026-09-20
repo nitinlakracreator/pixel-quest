@@ -49,6 +49,7 @@ export class Game {
   private lastTime = 0;
   private acc = 0;
   private readonly dt = 1000 / 60;
+  private readonly maxCatchUpSteps = 5;
   private demoMode = false;
 
   shakeAmount = 0;
@@ -69,7 +70,14 @@ export class Game {
     this.ui = new UI(this);
     this.demoRef = new DemoPilot(this);
     this.demoMode = new URLSearchParams(window.location.search).has("demo");
-    if (!localStorage.getItem("pq_notice_seen")) this.state = "notice";
+    if (this.demoMode) {
+      // Demo mode is intentionally deterministic and must be able to start in
+      // a clean browser profile for CI/screenshot verification.
+      localStorage.setItem("pq_notice_seen", "1");
+      this.beginLevel(1);
+    } else if (!localStorage.getItem("pq_notice_seen")) {
+      this.state = "notice";
+    }
     this.attachInput();
   }
 
@@ -85,11 +93,22 @@ export class Game {
     const up = (e: KeyboardEvent) => {
       this.keys[e.code] = false;
     };
+    const clearInput = () => {
+      this.keys = {};
+      this.touch.left = false;
+      this.touch.right = false;
+      this.touch.jump = false;
+      this.touch.attack = false;
+    };
     window.addEventListener("keydown", down);
     window.addEventListener("keyup", up);
+    window.addEventListener("blur", clearInput);
+    document.addEventListener("visibilitychange", clearInput);
     this._cleanupInput = () => {
       window.removeEventListener("keydown", down);
       window.removeEventListener("keyup", up);
+      window.removeEventListener("blur", clearInput);
+      document.removeEventListener("visibilitychange", clearInput);
     };
   }
   private _cleanupInput: () => void = () => {};
@@ -138,6 +157,10 @@ export class Game {
     if (this.state === "playing") this.state = "paused";
     else if (this.state === "paused") this.state = "playing";
     else if (this.state === "notice") this.state = "title";
+  }
+
+  pressPause() {
+    this.togglePause();
   }
 
   beginLevel(n: number) {
@@ -196,10 +219,14 @@ export class Game {
     // Demo autopilot drives inputs deterministically
     if (this.demoMode) this.demoRef.tick(this.state);
 
-    this.acc += delta;
-    while (this.acc >= this.dt) {
+    // Bound catch-up after a hidden-tab or mobile browser stall. This keeps the
+    // simulation deterministic without teleporting the player through hazards.
+    this.acc = Math.min(this.acc + delta, this.dt * this.maxCatchUpSteps);
+    let steps = 0;
+    while (this.acc >= this.dt && steps < this.maxCatchUpSteps) {
       this.update();
       this.acc -= this.dt;
+      steps++;
     }
     this.render();
   };

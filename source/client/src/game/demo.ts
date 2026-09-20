@@ -16,7 +16,9 @@ export class DemoPilot {
     this.t++;
     const k = this.game.keys;
     if (state === "title") {
-      if (this.t > 25) k["Enter"] = true;
+      // Synthetic key state alone cannot trigger edge-triggered menu actions;
+      // call the same semantic action used by keyboard and touch controls.
+      if (this.t > 25) this.game.pressAction();
       return;
     }
     if (state !== "playing") return;

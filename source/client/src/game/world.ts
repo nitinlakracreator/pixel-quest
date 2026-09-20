@@ -17,6 +17,7 @@ export interface LevelData {
   map: number[][]; // 0 air, 1 stone, 2 top-stone, 3 lava, 4 spike, 5 pillar, 6 torch
   playerStart: [number, number];
   exitX: number; // tile x of level exit
+  checkpoints: number[]; // tile x positions that activate on forward progress
   enemies: { kind: "slime" | "bat" | "skull"; x: number; y: number }[];
   coins: [number, number][];
   gems: [number, number][];
@@ -85,6 +86,7 @@ function buildLevel1(): LevelData {
     map,
     playerStart: [2, 11],
     exitX: 117,
+    checkpoints: [38, 70, 100],
     enemies: [
       { kind: "slime", x: 15, y: 12 },
       { kind: "slime", x: 27, y: 8 },
@@ -139,6 +141,7 @@ function buildLevel2(): LevelData {
     map,
     playerStart: [2, 11],
     exitX: 126,
+    checkpoints: [36, 70, 104],
     enemies: [
       { kind: "bat", x: 20, y: 5 },
       { kind: "slime", x: 22, y: 7 },
@@ -196,6 +199,7 @@ function buildLevel3(): LevelData {
     map,
     playerStart: [2, 11],
     exitX: 136,
+    checkpoints: [34, 66, 100],
     enemies: [
       { kind: "bat", x: 18, y: 5 },
       { kind: "skull", x: 30, y: 5 },
@@ -232,6 +236,7 @@ export class World {
   private exitFlag = 0; // exit portal animation
   private bossDefeated = false;
   private levelIntroT = 0;
+  private checkpointX = 2 * TILE;
 
   private static readonly ASSETS = "./assets/";
 
@@ -276,11 +281,12 @@ export class World {
     this.player = new Player(this.game, this.level.playerStart[0] * TILE, this.level.playerStart[1] * TILE);
     this.player.invincible = 120; // 2s spawn shield
     this.cameraX = 0;
+    this.checkpointX = this.level.playerStart[0] * TILE;
     this.levelIntroT = 120; // 2s level intro overlay
   }
 
   respawnPlayer() {
-    this.player.x = this.level.playerStart[0] * TILE;
+    this.player.x = this.checkpointX;
     this.player.y = this.level.playerStart[1] * TILE;
     this.player.vx = 0;
     this.player.vy = 0;
@@ -331,6 +337,8 @@ export class World {
     }
 
     this.player.update(this);
+    const nextCheckpoint = this.level.checkpoints.find((x) => this.player.x >= x * TILE && x * TILE > this.checkpointX);
+    if (nextCheckpoint !== undefined) this.checkpointX = nextCheckpoint * TILE;
     for (const e of this.enemies) e.update(this);
     if (this.boss && this.boss.alive) {
       this.boss.update(this);
@@ -432,6 +440,17 @@ export class World {
     r.fillRect(ex, 8 * TILE, TILE, 5 * TILE);
     r.ctx.restore();
     r.text(portalOpen ? "EXIT" : "BOSS", ex - 4, 7 * TILE - 6, portalOpen ? "#ffd166" : "#ff5c5c", 2);
+
+    // Checkpoint beacon: a small persistent visual cue for the respawn system.
+    const checkpointScreenX = this.checkpointX - cam;
+    if (checkpointScreenX > -TILE && checkpointScreenX < GW + TILE) {
+      r.ctx.save();
+      r.ctx.fillStyle = "rgba(45, 212, 168, 0.3)";
+      r.ctx.fillRect(checkpointScreenX, 8 * TILE, 1, 5 * TILE);
+      r.ctx.fillStyle = "#2dd4a8";
+      r.ctx.fillRect(checkpointScreenX - 3, 8 * TILE, 7, 4);
+      r.ctx.restore();
+    }
 
     for (const c of this.coins) if (!c.dead) c.draw(r, cam);
     for (const gm of this.gems) if (!gm.dead) gm.draw(r, cam);

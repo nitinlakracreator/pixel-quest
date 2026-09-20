@@ -15,14 +15,14 @@ Run, jump, and fight through volcanic tunnels, defeat slimes, bats, and fire sku
 | Arrow keys / WASD | Move |
 | Space / W / Up | Jump |
 | Z | Attack |
-| Esc | Pause |
+| Esc / mobile Pause | Pause |
 | N | Show ownership notice |
 
-On mobile, touch buttons appear on screen automatically.
+On mobile, touch buttons appear automatically for left, right, jump, attack, and pause. The game scales to portrait and landscape viewports, releases held input when the browser is backgrounded, and activates forward checkpoints so a missed jump does not restart the whole level.
 
 ## About
 
-This game features 3 hand-designed levels plus a boss battle, parallax cave backgrounds, screen shake, particles, coins, gems, lava pits, and spikes. Includes the Transformers-style "Welcome Nitin." startup animation, your ownership notice, and a highlighted credit banner.
+This game features 3 hand-designed levels plus a boss battle, parallax cave backgrounds, screen shake, particles, coins, gems, lava pits, spikes, and checkpoint beacons. Includes the Transformers-style "Welcome Nitin." startup animation, your ownership notice, and a highlighted credit banner. The editable source includes a deterministic `?demo` mode used for desktop and mobile browser verification.
 
 **Ownership:** This game is the original and sole property of Nitin Lakra, GP Sonipat Polytechnic. All rights reserved. Not for experimental use by others — see `NOTICE.md`.
 
