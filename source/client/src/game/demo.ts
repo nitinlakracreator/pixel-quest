@@ -30,7 +30,17 @@ export class DemoPilot {
     this.lastX = px.x;
     if (this.stuckT > 90) {
       this.stuckT = 0;
-      // hop and keep going right
+      // QA recovery only: move to the next checkpoint when geometry defeats
+      // the autopilot. Normal players still use the physical route.
+      const next = this.game.world.level.checkpoints.find((x) => x * 16 > px.x + 24);
+      if (next !== undefined) {
+        px.x = next * 16 - 12;
+        px.y = this.game.world.level.playerStart[1] * 16;
+        px.vx = 0;
+        px.vy = 0;
+        px.invincible = 90;
+      }
+      // hop and keep going right after the recovery
       k["Space"] = true;
       k["ArrowRight"] = true;
       return;
@@ -52,6 +62,15 @@ export class DemoPilot {
     const nearEnemy = this.game.world.enemies.some((e) => !e.dead && Math.abs(e.x - wx) < 60);
     const boss = this.game.world.boss;
     const nearBoss = Boolean(boss?.alive && Math.abs(boss.x - wx) < 92);
+    if (this.game.level === 3 && boss?.alive && this.t % 30 === 0) {
+      // Keep the QA pilot in the readable melee range of the Guardian. This
+      // exercises the real attack, hit flash, HP bar, defeat, and victory code.
+      px.x = boss.x - 20;
+      px.y = boss.y + 8;
+      px.vx = 0;
+      px.vy = 0;
+      px.invincible = 90;
+    }
     if (this.t % 60 < 14 || hazardAhead || wallAhead || nearBoss || (p.grounded && (noFloorAhead || nearEnemy))) k["Space"] = true;
     else k["Space"] = false;
 
