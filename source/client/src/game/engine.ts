@@ -151,6 +151,10 @@ export class Game {
     else if (this.state === "notice") this.state = "title";
   }
 
+  pressPause() {
+    this.togglePause();
+  }
+
   beginLevel(n: number) {
     this.level = n;
     this.world.loadLevel(n);
