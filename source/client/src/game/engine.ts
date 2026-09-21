@@ -49,9 +49,7 @@ export class Game {
   private lastTime = 0;
   private acc = 0;
   private readonly dt = 1000 / 60;
-  private readonly maxCatchUpSteps = 5;
   private demoMode = false;
-  private deathCooldown = 0;
 
   shakeAmount = 0;
   score = 0;
@@ -62,6 +60,7 @@ export class Game {
 
   keys: Record<string, boolean> = {};
   touch = { left: false, right: false, jump: false, attack: false };
+  private actionPressed = false;
 
   constructor(private canvas: HTMLCanvasElement) {
     this.rendererRef = new PixelRenderer(canvas);
@@ -71,53 +70,42 @@ export class Game {
     this.ui = new UI(this);
     this.demoRef = new DemoPilot(this);
     this.demoMode = new URLSearchParams(window.location.search).has("demo");
-    if (this.demoMode) {
-      // Demo mode is intentionally deterministic and must be able to start in
-      // a clean browser profile for CI/screenshot verification.
-      localStorage.setItem("pq_notice_seen", "1");
-      this.beginLevel(1);
-      (window as unknown as { __PIXEL_QUEST__?: Game }).__PIXEL_QUEST__ = this;
-    } else if (!localStorage.getItem("pq_notice_seen")) {
-      this.state = "notice";
-    }
+    if (!localStorage.getItem("pq_notice_seen")) this.state = "notice";
     this.attachInput();
   }
 
   private attachInput() {
     const down = (e: KeyboardEvent) => {
+      const wasDown = this.keys[e.code] === true;
       this.keys[e.code] = true;
       if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) e.preventDefault();
       if (e.code === "Escape") this.togglePause();
       if (e.code === "KeyN") this.showNotice();
-      if (e.code === "KeyR") this.restart();
-      if (e.code === "Enter" || e.code === "Space") this.onActionPress();
+      if ((e.code === "Enter" || e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW") && !wasDown) {
+        this.actionPressed = true;
+        this.onActionPress();
+      }
       if (e.code === "KeyZ" || e.code === "KeyC" || e.code === "KeyX") this.onAttackPress();
     };
     const up = (e: KeyboardEvent) => {
       this.keys[e.code] = false;
     };
-    const clearInput = () => {
-      this.keys = {};
-      this.touch.left = false;
-      this.touch.right = false;
-      this.touch.jump = false;
-      this.touch.attack = false;
-    };
     window.addEventListener("keydown", down);
     window.addEventListener("keyup", up);
-    window.addEventListener("blur", clearInput);
-    document.addEventListener("visibilitychange", clearInput);
     this._cleanupInput = () => {
       window.removeEventListener("keydown", down);
       window.removeEventListener("keyup", up);
-      window.removeEventListener("blur", clearInput);
-      document.removeEventListener("visibilitychange", clearInput);
     };
   }
   private _cleanupInput: () => void = () => {};
 
   startAction(): boolean {
     return this.keys["Space"] || this.keys["Enter"] || this.keys["ArrowUp"] || this.keys["KeyW"] || this.keys["KeyX"] || this.touch.jump;
+  }
+  consumeActionPress(): boolean {
+    const pressed = this.actionPressed || this.touch.jump;
+    this.actionPressed = false;
+    return pressed;
   }
   startAttack(): boolean {
     return this.keys["KeyZ"] || this.keys["KeyC"] || this.keys["ControlLeft"] || this.touch.attack;
@@ -138,13 +126,13 @@ export class Game {
       this.beginLevel(1);
     } else if (this.state === "gameover" || this.state === "victory") {
       this.resetRun();
-      // Restart directly so a single tap on a phone is enough to play again.
-      this.beginLevel(1);
+      this.state = "title";
     }
   }
 
   /** Shared action entry point for keyboard, gamepad, and touch controls. */
   pressAction() {
+    this.actionPressed = true;
     this.onActionPress();
   }
 
@@ -163,10 +151,6 @@ export class Game {
     else if (this.state === "notice") this.state = "title";
   }
 
-  pressPause() {
-    this.togglePause();
-  }
-
   beginLevel(n: number) {
     this.level = n;
     this.world.loadLevel(n);
@@ -176,10 +160,6 @@ export class Game {
   }
 
   playerDied() {
-    // A hazard and an enemy can overlap in the same simulation step. Treat
-    // that as one hit, not two lost lives, and keep the respawn forgiving.
-    if (this.state !== "playing" || this.deathCooldown > 0) return;
-    this.deathCooldown = 18;
     this.lives -= 1;
     this.shakeAmount = 8;
     if (this.lives <= 0) {
@@ -201,7 +181,6 @@ export class Game {
     this.coins = 0;
     this.lives = 3;
     this.level = 1;
-    this.deathCooldown = 0;
   }
 
   finalizeRun() {
@@ -228,14 +207,10 @@ export class Game {
     // Demo autopilot drives inputs deterministically
     if (this.demoMode) this.demoRef.tick(this.state);
 
-    // Bound catch-up after a hidden-tab or mobile browser stall. This keeps the
-    // simulation deterministic without teleporting the player through hazards.
-    this.acc = Math.min(this.acc + delta, this.dt * this.maxCatchUpSteps);
-    let steps = 0;
-    while (this.acc >= this.dt && steps < this.maxCatchUpSteps) {
+    this.acc += delta;
+    while (this.acc >= this.dt) {
       this.update();
       this.acc -= this.dt;
-      steps++;
     }
     this.render();
   };
@@ -247,7 +222,6 @@ export class Game {
 
   private update() {
     if (this.state === "playing") {
-      this.deathCooldown = Math.max(0, this.deathCooldown - 1);
       this.world.update();
       this.effectsRef.update();
       if (this.shakeAmount > 0) this.shakeAmount = Math.max(0, this.shakeAmount - 0.4);
@@ -279,6 +253,5 @@ export class Game {
     this._cleanupInput();
     this.world.dispose();
     this.atlas.dispose();
-    if (this.demoMode) delete (window as unknown as { __PIXEL_QUEST__?: Game }).__PIXEL_QUEST__;
   }
 }

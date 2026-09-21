@@ -60,7 +60,7 @@ export class Player {
 
     // Jump buffering + coyote time. Grounding is resolved after collision below,
     // so a fresh landing can immediately feed the next jump buffer.
-    if (g.startAction()) {
+    if (g.consumeActionPress()) {
       if (this.jumpBuf <= 0) this.jumpBuf = 8;
     }
     this.jumpBuf = Math.max(0, this.jumpBuf - 1);
