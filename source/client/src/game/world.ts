@@ -407,7 +407,8 @@ export class World {
       r.ctx.save();
       r.ctx.globalAlpha = 1 - a * 0.4;
       r.text(`LEVEL ${this.game.level}`, GW / 2, 92, "#ffd166", 10, "center");
-      r.text(this.level.name, GW / 2, 112, "#ff7a33", 5, "center");
+      // Keep long level names inside the fixed 424px canvas on phones.
+      r.text(this.level.name, GW / 2, 112, "#ff7a33", 3, "center");
       r.ctx.restore();
     }
 

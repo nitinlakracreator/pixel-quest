@@ -41,6 +41,7 @@ export default function GameCanvas() {
       className={`pq-touch-button ${className}`}
       onPointerDown={(event) => {
         event.preventDefault();
+        event.currentTarget.focus({ preventScroll: true });
         event.currentTarget.setPointerCapture(event.pointerId);
         setTouch(key, true);
       }}
@@ -53,6 +54,7 @@ export default function GameCanvas() {
       }}
       onPointerCancel={() => setTouch(key, false)}
       onLostPointerCapture={() => setTouch(key, false)}
+      onContextMenu={(event) => event.preventDefault()}
     >
       {label}
     </button>
@@ -87,8 +89,10 @@ export default function GameCanvas() {
             className="pq-touch-button pq-pause"
             onPointerDown={(event) => {
               event.preventDefault();
+              event.currentTarget.focus({ preventScroll: true });
               gameRef.current?.pressPause();
             }}
+            onContextMenu={(event) => event.preventDefault()}
           >
             <span aria-hidden="true">Ⅱ</span>
           </button>

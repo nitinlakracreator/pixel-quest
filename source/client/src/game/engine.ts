@@ -51,6 +51,7 @@ export class Game {
   private readonly dt = 1000 / 60;
   private readonly maxCatchUpSteps = 5;
   private demoMode = false;
+  private deathCooldown = 0;
 
   shakeAmount = 0;
   score = 0;
@@ -88,6 +89,7 @@ export class Game {
       if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) e.preventDefault();
       if (e.code === "Escape") this.togglePause();
       if (e.code === "KeyN") this.showNotice();
+      if (e.code === "KeyR") this.restart();
       if (e.code === "Enter" || e.code === "Space") this.onActionPress();
       if (e.code === "KeyZ" || e.code === "KeyC" || e.code === "KeyX") this.onAttackPress();
     };
@@ -136,7 +138,8 @@ export class Game {
       this.beginLevel(1);
     } else if (this.state === "gameover" || this.state === "victory") {
       this.resetRun();
-      this.state = "title";
+      // Restart directly so a single tap on a phone is enough to play again.
+      this.beginLevel(1);
     }
   }
 
@@ -173,6 +176,10 @@ export class Game {
   }
 
   playerDied() {
+    // A hazard and an enemy can overlap in the same simulation step. Treat
+    // that as one hit, not two lost lives, and keep the respawn forgiving.
+    if (this.state !== "playing" || this.deathCooldown > 0) return;
+    this.deathCooldown = 18;
     this.lives -= 1;
     this.shakeAmount = 8;
     if (this.lives <= 0) {
@@ -194,6 +201,7 @@ export class Game {
     this.coins = 0;
     this.lives = 3;
     this.level = 1;
+    this.deathCooldown = 0;
   }
 
   finalizeRun() {
@@ -239,6 +247,7 @@ export class Game {
 
   private update() {
     if (this.state === "playing") {
+      this.deathCooldown = Math.max(0, this.deathCooldown - 1);
       this.world.update();
       this.effectsRef.update();
       if (this.shakeAmount > 0) this.shakeAmount = Math.max(0, this.shakeAmount - 0.4);
